@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using BondReader;
 using BondReader.Schemas;
@@ -15,6 +17,8 @@ using Microsoft.Win32;
 using Newtonsoft.Json;
 using Serilog;
 using Serilog.Formatting.Compact;
+using static Bond.Deserialize;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 using Utils = Halo_Forge_Bot.Utilities.Utils;
 
 namespace Halo_Forge_Bot
@@ -36,9 +40,7 @@ namespace Halo_Forge_Bot
                 .CreateLogger();
 
             Log.Information("----------APP START----------");
-
-            // BotClipboard.clipboard.ClipboardChanged += BotClipboard.ClipboardChanged;
-
+            
             string strExeFilePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string strWorkPath = System.IO.Path.GetDirectoryName(strExeFilePath);
 
@@ -46,22 +48,12 @@ namespace Halo_Forge_Bot
 
             InitializeComponent();
             Input.InitInput();
-
-
-            /*  var staticFields = typeof(HaloPointers).GetFields();
-              foreach (var field in staticFields)
-              {
-                  if (field.FieldType == typeof(string))
-                  {
-                      CurrentPointersLabel.Text += Environment.NewLine + field.Name.ToString() + ": " +
-                                                   (string)field.GetValue(null);
-                  }
-              }
-              */
         }
 
         private BondSchema? _selectedMap;
         public static string? SelecteMapPath;
+        public static bool resume;
+        public static string mapName;
 
         private void LoadMvar_OnClick(object sender, RoutedEventArgs e)
         {
@@ -74,20 +66,63 @@ namespace Halo_Forge_Bot
                 MapItemCount.Content = _selectedMap.Items.Count;
                 string estimate = $"{Math.Round(TimeSpan.FromSeconds(_selectedMap.Items.Count * 7).TotalHours, 2)}h";
                 EstimatedTime.Content = estimate;
+                mapName = openFileDialog.SafeFileName;
+                
+                mvarLoaded.Text = $"MVAR Loaded- {openFileDialog.SafeFileName}";
+                if (File.Exists(Utils.ExePath + $"/recovery/currentObjectRecoveryIndex-{mapName}.json"))
+                {
+                    var result = MessageBox.Show("It looks like you've run the bot for this mvar file previously. Do you want to resume the previous session?", "Reload", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No);
+
+                    switch (result)
+                    {
+                        case MessageBoxResult.Yes:
+                            resume = true;
+                            _selectedMap = null;
+                            MapItemCount.Content = "";
+                            EstimatedTime.Content = "";
+                            LoadMvar.IsEnabled = false;
+                            mvarLoaded.Text = "MVAR Loaded - None";
+                            resumeCb.IsChecked = true;
+                            break;
+                        case MessageBoxResult.No:
+                            resume = false;                           
+                            resumeCb.IsChecked = false;
+                            break;
+                    }
+                }
             }
         }
 
         private async void StartBot_OnClick(object sender, RoutedEventArgs e)
         {
-            if (_selectedMap == null)
+            if (_selectedMap == null && resume == false)
             {
                 Log.Error("Selected map is null, select a map first");
                 return;
             }
 
             Log.Information("-----STARTING BOT-----");
-            await Bot.StartBot(_selectedMap, int.Parse(ItemRangeStart.Text), int.Parse(ItemRangeEnd.Text));
+            await Bot.StartBot(_selectedMap, mapName, int.Parse(ItemRangeStart.Text), int.Parse(ItemRangeEnd.Text), resume);
             Log.Information("-----STOPPING BOT-----");
+        }
+
+        private async void HandleResumeCheck(object sender, RoutedEventArgs e)
+        {
+            CheckBox cb = sender as CheckBox;
+            if ((bool)cb.IsChecked)
+            {
+                resume = true;
+                _selectedMap = null;
+                MapItemCount.Content = "";
+                EstimatedTime.Content = "";
+                LoadMvar.IsEnabled = false;
+                mvarLoaded.Text = "MVAR Loaded - None";
+            }
+            else
+            {
+                resume = false;
+                LoadMvar.IsEnabled = true;
+            }
         }
     }
 }

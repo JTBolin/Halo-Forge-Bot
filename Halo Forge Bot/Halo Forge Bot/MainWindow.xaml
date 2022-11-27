@@ -5,60 +5,79 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Halo_Forge_Bot"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800" MinWidth="800" MinHeight="450">
-
-    <Grid ShowGridLines="True">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="150"></ColumnDefinition>
-            <ColumnDefinition Width="Auto"></ColumnDefinition>
-        </Grid.ColumnDefinitions>
-
-
-        <StackPanel>
-            <Button Name="LoadMvar" Height="50" FontSize="20" Click="LoadMvar_OnClick">Load .mvar</Button>
-            <Button Name="LoadBlender" Height="50" FontSize="20">Load blender</Button>
-            <Button Height="50" FontSize="20" Click="StartBot_OnClick">START BOT</Button>
-            <TextBlock Height="50" FontSize="15" TextWrapping="Wrap" TextAlignment="Center">press LEFT ARROW to stop!</TextBlock>
-            
-            <Label FontSize="15">Object Range:</Label>
-            <StackPanel Orientation="Horizontal">
-                <TextBox Name="ItemRangeStart" Margin="5 0 0 0" Width="50" Height="auto" FontSize="15" HorizontalContentAlignment="Center"
-                         VerticalContentAlignment="Center">
-                    0
-                </TextBox>
-                <Label FontSize="15">-></Label>
-                <TextBox Name="ItemRangeEnd" Width="50" Height="auto" FontSize="15" HorizontalContentAlignment="Center"
-                         VerticalContentAlignment="Center">
-                    0
-                </TextBox>
-            </StackPanel>
-            <Label FontSize="10">keep range at 0 for entire map</Label>
-        </StackPanel>
-
-        <Grid Grid.Column="1">
-            <StackPanel Name="MapInfoStackPanel">
-                <Grid ShowGridLines="True">
+        Title="MainWindow">
+   
+            <StackPanel Margin="0,0,236,0" Name="mainStackPanel">
+        <Grid ShowGridLines="False" Margin="0,10,0,0" Width="{Binding ActualWidth, ElementName=mainStackPanel}">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="100"></ColumnDefinition>
-                        <ColumnDefinition Width="50"></ColumnDefinition>
+                        <ColumnDefinition Width="Auto"></ColumnDefinition>
+                        <ColumnDefinition Width="Auto"></ColumnDefinition>
                     </Grid.ColumnDefinitions>
 
-                    <StackPanel>
-                        <Label>Item Count:</Label>
-                        <Label>EstimatedTime</Label>
+
+                    <StackPanel Grid.Column="0">
+                        <Button Name="LoadMvar" Height="50" FontSize="20" Click="LoadMvar_OnClick" Margin="5,3,5,25">Load .mvar</Button>
+                        <Button Name="LoadBlender" Height="50" FontSize="20" Margin="5,0,5,25">Load blender</Button>
+                        <Button Height="50" FontSize="20" Click="StartBot_OnClick" Margin="5,0,5,0">START BOT</Button>
+                        <TextBlock x:Name="text1"  />
+                        <CheckBox x:Name="resumeCb" Content="Resume Bot?"
+                            Checked="HandleResumeCheck" Unchecked="HandleResumeCheck" HorizontalAlignment="Center" Margin="0,0,0,25" VerticalAlignment="Center" FontSize="14" Foreground="#FFBD0000" />
+                        <TextBlock Height="50" FontSize="15" TextWrapping="Wrap" TextAlignment="Center">press LEFT ARROW to stop!</TextBlock>
+
+                        <Label FontSize="15">Object Range:</Label>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBox Name="ItemRangeStart" Margin="5 0 0 0" Width="50" Height="auto" FontSize="15" HorizontalContentAlignment="Center"
+                                     VerticalContentAlignment="Center">
+                                0
+                            </TextBox>
+                            <Label FontSize="15">-></Label>
+                            <TextBox Name="ItemRangeEnd" Width="50" Height="auto" FontSize="15" HorizontalContentAlignment="Center"
+                                     VerticalContentAlignment="Center">
+                                0
+                            </TextBox>
+                        </StackPanel>
+                        <Label FontSize="10">keep range at 0 for entire map</Label>
                     </StackPanel>
-                    <StackPanel Grid.Column="1" HorizontalAlignment="Stretch">
-                        <Label Name="MapItemCount"></Label>
-                        <Label Name="EstimatedTime" HorizontalContentAlignment="Left" Width="auto"></Label>
+
+                    <DockPanel Grid.Column="1">
+                        <Border BorderBrush="Gray" BorderThickness="1,1,1,1" DockPanel.Dock="Left" Margin="5,5,5,5" >
+                         <StackPanel>
+                            <Label FontSize="18">Details</Label>
+                            <Separator></Separator>
+                            <Grid Grid.Column="1" Width="400" >
+                                <StackPanel Name="MapInfoStackPanel" Margin="0,0,162,0" Width="400">
+                                    <Grid ShowGridLines="False">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="100"></ColumnDefinition>
+                                            <ColumnDefinition Width="300"></ColumnDefinition>
+                                        </Grid.ColumnDefinitions>
+
+                                        <StackPanel>
+                                            <Label>Item Count:</Label>
+                                            <Label>EstimatedTime:</Label>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="1" HorizontalAlignment="Left" Width="300">
+                                            <Label Name="MapItemCount"></Label>
+                                            <Label Name="EstimatedTime" ></Label>
+                                        </StackPanel>
+
+
+                                    </Grid>
+                                </StackPanel>
+                            </Grid>
                     </StackPanel>
-
-
-                </Grid>
-            </StackPanel>
-
-
+                </Border>
+            </DockPanel>
         </Grid>
-
-    </Grid>
+                <StatusBar Name="sbar" VerticalAlignment="Center" Background="#FFE0E0E0">
+                    <StatusBarItem Height="17">
+                        <TextBlock x:Name="mvarLoaded" HorizontalAlignment="Left" VerticalAlignment="Center" Text="MVAR Loaded - None"/>
+                    </StatusBarItem>
+                    <Separator Padding="18,0,10,0" Margin="10,2,10,2"></Separator>
+                    <StatusBarItem Background="#FFE0E0E0" Height="17">
+                        <TextBlock x:Name="blenderFileLoaded" HorizontalAlignment="Left" VerticalAlignment="Center" Text="Blender file Loaded - None"/>
+                    </StatusBarItem>
+                </StatusBar>
+            </StackPanel>
 
 </Window>
